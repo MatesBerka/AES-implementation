@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "----------------------- START ------------------------"
-# echo "Preklad(gcc):"
-# gcc -Wall -Werror -g -std=c99 -o fat fat.c -lpthread
+echo "Preklad(gcc):"
+gcc -Wall -Werror -g -std=c99 -o AES AES.c
 
 echo "--- Test AES-128 -------------------------------------"
 echo "PLAINTEXT: 00112233445566778899aabbccddeeff (in hex)"

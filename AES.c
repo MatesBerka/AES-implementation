@@ -673,7 +673,7 @@ int main ( int argc, char *argv[] ) {
                     for (; k < key_size; k++) { key[k] = hextobyte(hex_key + (k * 2)); };
                     
 				} else {
-				    printf("Incorrect key size %d. Supported sizes are 32hex (128b) 48hex (192b) and 64hex (256b). If you need help then run program with -h or --help.\n", strlen(argv[i]));
+				    printf("Incorrect key size %d. Supported sizes are 32hex (128b) 48hex (192b) and 64hex (256b). If you need help then run program with -h or --help.\n", (int)strlen(argv[i]));
 					exit(1);
 				}
 			} else if ((strcmp("-e", argv[i]) == 0) || (strcmp("--encode", argv[i]) == 0)) {
@@ -699,7 +699,7 @@ int main ( int argc, char *argv[] ) {
                     // sscanf(hex_iv + (k * 2), "%2hhx", &iv[k]);
                     for (k = 0; k < 16; k++) { iv[k] = hextobyte(hex_iv + (k * 2)); };
 				} else {
-				    printf("Incorrect initialization vector size %d. Supported size is 32hex (128b). If you need help then run program with -h or --help.\n", strlen(argv[i]));
+				    printf("Incorrect initialization vector size %d. Supported size is 32hex (128b). If you need help then run program with -h or --help.\n", (int)strlen(argv[i]));
 					exit(1);
 				}
 			} else {
