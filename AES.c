@@ -103,7 +103,6 @@ char* type;
 FILE* input_file;
 // Points to output file
 FILE* output_file;
-
  
 /*
 ______________________________________________________________________________________________________________________
@@ -397,18 +396,15 @@ void invShiftRows() {
 /*
 ___________________________________________________________
  
-decipher
+Decipher
 ___________________________________________________________
 */
 void decipher() {
     uint8_t round = 0;
 
-    // Add the First round key to the state before starting the rounds.
+    // Adding first round key to the state before starting rounds.
     addRoundKey(Nr); 
 
-    // There will be Nr rounds.
-    // The first Nr-1 rounds are identical.
-    // These Nr-1 rounds are executed in the loop below.
     for (round = Nr-1; round > 0; round--) {
         invShiftRows();
         invSubBytes();
@@ -416,8 +412,6 @@ void decipher() {
         invMixColumns();
     }
 
-    // The last round is given below.
-    // The MixColumns function is not here in the last round.
     invShiftRows();
     invSubBytes();
     addRoundKey(0);
@@ -430,16 +424,14 @@ Decrypt CBC
 ___________________________________________________________
 */
 void decryptCBC() {
-    uint8_t data_block[BLOCK_SIZE];
-    uint8_t i, read = 0;
+    uint8_t i = 0;
+    uint8_t read = 0;
    
     state = (uint8_t *) malloc(BLOCK_SIZE);
-    if (state == NULL) { printf("Faild to allocate memory."); exit(1); }
+    if (state == NULL) { printf("Failed to allocate memory."); exit(1); }
     
     // iterate over file
-    while ((read = fread(data_block, 1, BLOCK_SIZE, input_file)) == BLOCK_SIZE) { 
-        // load input block into state
-        for (i = 0; i < BLOCK_SIZE; i++) { state[i] = data_block[i]; }
+    while ((read = fread(state, 1, BLOCK_SIZE, input_file)) == BLOCK_SIZE) { 
         
         keyExpansion();
         decipher();
@@ -454,9 +446,7 @@ void decryptCBC() {
     
     if (read > 0) { // there is one extra block
         // fill remaining space with zeros
-        memset(data_block + read, 0, BLOCK_SIZE - read);
-        // load input block into state
-        for (i = 0; i < BLOCK_SIZE; i++) { state[i] = data_block[i]; }
+        memset(state + read, 0, BLOCK_SIZE - read);
         
         keyExpansion();
         decipher();
@@ -476,15 +466,13 @@ Encrypt in CBC mode
 ___________________________________________________________
 */
 void encryptCBC() {
-    uint8_t data_block[BLOCK_SIZE];
-    uint8_t i, read = 0;
+    uint8_t i = 0;
+    uint8_t read = 0;
    
     state = (uint8_t *) malloc(BLOCK_SIZE);
-    if (state == NULL) { printf("Faild to allocate memory."); exit(1); }
+    if (state == NULL) { printf("Failed to allocate memory."); exit(1); }
     
-    while ((read = fread(data_block, 1, BLOCK_SIZE, input_file)) == BLOCK_SIZE) {
-        // load input block into state
-        for (i = 0; i < BLOCK_SIZE; i++) { state[i] = data_block[i]; }
+    while ((read = fread(state, 1, BLOCK_SIZE, input_file)) == BLOCK_SIZE) {
         // xor state with key
         for (i = 0; i < BLOCK_SIZE; i++) { state[i] ^= iv[i]; }
         
@@ -499,9 +487,7 @@ void encryptCBC() {
     
     if (read > 0) { // there is one extra block
         // fill remaining space with zeros
-        memset(data_block + read, 0, BLOCK_SIZE - read);
-        // load input block into state
-        for (i = 0; i < BLOCK_SIZE; i++) { state[i] = data_block[i]; }
+        memset(state + read, 0, BLOCK_SIZE - read);
         // xor state with key
         for (i = 0; i < BLOCK_SIZE; i++) { state[i] ^= iv[i]; }
         
@@ -523,7 +509,7 @@ void decryptECB() {
     uint8_t read = 0;
    
     state = (uint8_t *) malloc(BLOCK_SIZE);
-    if (state == NULL) { printf("Faild to allocate memory."); exit(1); }
+    if (state == NULL) { printf("Failed to allocate memory."); exit(1); }
     
     while ((read = fread(state, 1, BLOCK_SIZE, input_file)) == BLOCK_SIZE) {
         
@@ -555,7 +541,7 @@ void encryptECB() {
     uint8_t read = 0;
     
     state = (uint8_t *) malloc(BLOCK_SIZE);
-    if (state == NULL) { printf("Faild to allocate memory."); exit(1); }
+    if (state == NULL) { printf("Failed to allocate memory."); exit(1); }
     
     while ((read = fread(state, 1, BLOCK_SIZE, input_file)) == BLOCK_SIZE) {
         
@@ -593,12 +579,13 @@ Prints help guide
 ___________________________________________________________
 */
 void print_help() {
-  printf("Usage: AES (-if|--input-file) <file name>\n         # file to encrypt/decrypt"
-    	 "           (-of|--output-file) <file name>\n        # file to output encrypted/decrypted input file"
-  		 "           (-m|--mode) <CBC|ECB>\n                  # encryption/decryption mode"
-		 "           (-e|--encode|-d|--decode)                # pick encryption or decryption \n"
-		 "           (-k|--key) <key to use>\n                # Enter in hex format without spaces. Example: 2B7E151628AED2A6ABF7158809CF4F3C"
-		 "           [-iv|--initialization-vector] <vector>\n # required and used only with CBC mode. Enter in hex format.");
+  printf("Usage: AES (-if|--input-file) <file name>          # file to encrypt/decrypt\n"
+    	 "           (-of|--output-file) <file name>         # file to output encrypted/decrypted input file\n"
+  		 "           (-m|--mode) <CBC|ECB>                   # encryption/decryption mode\n"
+		 "           (-e|--encode|-d|--decode)               # pick encryption or decryption\n"
+		 "           (-k|--key) <key to use>                 # Enter in hex format without spaces.\n"
+		 "                                                   # Example: 2B7E151628AED2A6ABF7158809CF4F3C\n"
+		 "           [-iv|--initialization-vector] <vector>  # required and used only with CBC mode. Enter in hex format.\n");
 }
 
 
@@ -664,9 +651,9 @@ int main ( int argc, char *argv[] ) {
                     Nr += (Nk - 4);
                     
                     round_key = malloc((Nr + 1) * key_size);
-                    if (round_key == NULL) { printf("Faild to allocate memory."); exit(1); }
+                    if (round_key == NULL) { printf("Failed to allocate memory."); exit(1); }
                     key = malloc(key_size);
-                    if (key == NULL) { printf("Faild to allocate memory."); exit(1); }
+                    if (key == NULL) { printf("Failed to allocate memory."); exit(1); }
                     
                     uint8_t k = 0;
                      // Easier would be use this, but 'h' is not supported in MinGW windows at the moment. sscanf(hex_key + (k * 2), "%2hhx", key + k);
