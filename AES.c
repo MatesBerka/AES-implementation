@@ -168,7 +168,7 @@ void keyExpansion() {
 ___________________________________________________________
 
 Alternative to this function is to use precalculated tables
-https://en.wikipedia.org/wiki/Rijndael_mix_columns
+here: https://en.wikipedia.org/wiki/Rijndael_mix_columns
 ___________________________________________________________
 */
 uint8_t xtime(uint8_t x) {
@@ -179,7 +179,7 @@ uint8_t xtime(uint8_t x) {
 ___________________________________________________________
 
 Alternative to this function is to use precalculated tables
-https://en.wikipedia.org/wiki/Rijndael_mix_columns
+here: https://en.wikipedia.org/wiki/Rijndael_mix_columns
 ___________________________________________________________
 */
 uint8_t multiply(uint8_t x, uint8_t y) {
@@ -193,7 +193,7 @@ uint8_t multiply(uint8_t x, uint8_t y) {
 /*
 ___________________________________________________________
  
-The SubBytes Function Substitutes the values in the
+The SubBytes Function substitutes the values in the
 state matrix with values in an S-box.
 ___________________________________________________________
 */
@@ -229,20 +229,19 @@ ___________________________________________________________
  
 The ShiftRows() function shifts the rows in the state to the left.
 Each row is shifted with different offset.
-Offset = Row number. So the first row is not shifted.
 ___________________________________________________________
 */
 void shiftRows() {
   uint8_t tmp;
 
-  // move first row 1 columns to the left  
+  // move second row 1 columns to the left  
   tmp = state[1];
   state[1] = state[1 * NUMBER_OF_COLUMNS + 1];
   state[1 * NUMBER_OF_COLUMNS + 1] = state[2 * NUMBER_OF_COLUMNS + 1];
   state[2 * NUMBER_OF_COLUMNS + 1] = state[3 * NUMBER_OF_COLUMNS + 1];
   state[3 * NUMBER_OF_COLUMNS + 1] = tmp;
 
-  // move second row 2 columns to the left  
+  // move third row 2 columns to the left  
   tmp = state[2];
   state[2] = state[2 * NUMBER_OF_COLUMNS + 2];
   state[2 * NUMBER_OF_COLUMNS + 2] = tmp;
@@ -251,7 +250,7 @@ void shiftRows() {
   state[1 * NUMBER_OF_COLUMNS + 2] = state[3 * NUMBER_OF_COLUMNS  + 2];
   state[3 * NUMBER_OF_COLUMNS + 2] = tmp;
 
-  // move third row 3 columns to the left
+  // move fourth row 3 columns to the left
   tmp = state[3];
   state[3] = state[3 * NUMBER_OF_COLUMNS + 3];
   state[3 * NUMBER_OF_COLUMNS + 3] = state[2 * NUMBER_OF_COLUMNS + 3];
@@ -263,21 +262,9 @@ void shiftRows() {
 ___________________________________________________________
  
 MixColumns function mixes the columns of the state matrix
-https://en.wikipedia.org/wiki/Rijndael_mix_columns
+source: https://en.wikipedia.org/wiki/Rijndael_mix_columns
 ___________________________________________________________
 */
-// void mixColumns(void) {
-//     uint8_t i, tmp1, tmp2;
-  
-//     for (i = 0; i < 4; i++) {  
-//         tmp1 = state[0 * 4 + i];
-//         tmp2 = state[0 * 4 + i] ^ state[1 * 4 + i] ^ state[2 * 4 + i] ^ state[3 * 4 + i];
-//         state[0 * 4 + i] ^= xtime(state[0 * 4 + i] ^ state[1 * 4 + i]) ^ tmp2;
-//         state[1 * 4 + i] ^= xtime(state[1 * 4 + i] ^ state[2 * 4 + i]) ^ tmp2;
-//         state[2 * 4 + i] ^= xtime(state[2 * 4 + i] ^ state[3 * 4 + i]) ^ tmp2;
-//         state[3 * 4 + i] ^= xtime(state[3 * 4 + i] ^ tmp1) ^ tmp2;
-//     }
-// }
 
 void mixColumns() {
     uint8_t i, tmp1, tmp2, tmp3;
@@ -285,6 +272,7 @@ void mixColumns() {
     for(i = 0; i < 4; i++) {  
         tmp3 = state[i * 4 + 0];
         tmp1 = state[i * 4 + 0] ^ state[i * 4 + 1] ^ state[i * 4 + 2] ^ state[i * 4 + 3];
+        
         tmp2 = state[i * 4 + 0] ^ state[i * 4 + 1]; tmp2 = xtime(tmp2); state[i * 4 + 0] ^= tmp2 ^ tmp1;
         tmp2 = state[i * 4 + 1] ^ state[i * 4 + 2]; tmp2 = xtime(tmp2); state[i * 4 + 1] ^= tmp2 ^ tmp1;
         tmp2 = state[i * 4 + 2] ^ state[i * 4 + 3]; tmp2 = xtime(tmp2); state[i * 4 + 2] ^= tmp2 ^ tmp1;
@@ -301,10 +289,8 @@ ___________________________________________________________
 void encipher() {
   uint8_t round = 0;
 
-  // Add the First round key to the state before starting the rounds.
   addRoundKey(0); 
   
-  // There will be Nr rounds.
   // The first Nr-1 rounds are identical.
   // These Nr-1 rounds are executed in the loop below.
   for (round = 1; round < Nr; round++) {
@@ -314,7 +300,6 @@ void encipher() {
     addRoundKey(round);
   }
   
-  // The last round is given below.
   // The MixColumns function is not here in the last round.
   subBytes();
   shiftRows();
@@ -324,7 +309,7 @@ void encipher() {
 /*
 ___________________________________________________________
  
-The SubBytes Function Substitutes the values in the
+SubBytes function substitutes values in the
 state matrix with values in an S-box.
 ___________________________________________________________
 */
@@ -369,14 +354,14 @@ ___________________________________________________________
 void invShiftRows() {
   uint8_t tmp;
 
-  // Rotate first row 1 columns to right  
+  // Rotate second row 1 columns to right  
   tmp = state[3 * 4 + 1];
   state[3 * 4 + 1] = state[2 * 4 + 1];
   state[2 * 4 + 1] = state[1 * 4 + 1];
   state[1 * 4 + 1] = state[1];
   state[1] = tmp;
 
-  // Rotate second row 2 columns to right 
+  // Rotate third row 2 columns to right 
   tmp = state[2];
   state[2] = state[2 * 4 + 2];
   state[2 * 4 + 2] = tmp;
@@ -385,7 +370,7 @@ void invShiftRows() {
   state[1 * 4 + 2] = state[3 * 4 + 2];
   state[3 * 4 + 2] = tmp;
 
-  // Rotate third row 3 columns to right
+  // Rotate fourth row 3 columns to right
   tmp = state[3];
   state[3] = state[1 * 4 + 3];
   state[1 * 4 + 3] = state[2 * 4 + 3];
