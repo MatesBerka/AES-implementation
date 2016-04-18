@@ -442,6 +442,7 @@ void decryptCBC() {
         // write block to file
         fwrite(state, 1, BLOCK_SIZE, output_file);
     }
+    free(state);
 }
 
 /*
@@ -482,6 +483,7 @@ void encryptCBC() {
         // write block to file
         fwrite(state, 1, BLOCK_SIZE, output_file);
     }
+    free(state);
 }
 
 /*
@@ -514,6 +516,7 @@ void decryptECB() {
         // write block to file
         fwrite(state, 1, BLOCK_SIZE, output_file);
     }
+    free(state);
 }
  
  /*
@@ -546,6 +549,7 @@ void encryptECB() {
         // write block to file
         fwrite(state, 1, BLOCK_SIZE, output_file);
     }
+    free(state);
 }
 
 /*
@@ -710,6 +714,8 @@ int main ( int argc, char *argv[] ) {
 		}
 	}
 	
+        free(round_key);
+        free(key);
 	fclose(input_file);
 	fclose(output_file);
 }
